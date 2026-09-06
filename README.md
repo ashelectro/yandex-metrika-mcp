@@ -1,17 +1,3 @@
-> ## 🗄 Репозиторий заархивирован
->
-> Разработка переехала в **[theYahia/YaAll](https://github.com/theYahia/YaAll)** —
-> сборку, где весь яндексовский слой лежит в одном месте: официальные MCP-серверы
-> Яндекса, MCP под Директ и Метрику, скилл YaGEO и Wordstat-гейт.
->
-> Актуальная версия того, что лежало здесь: [`mcp/yandex-metrika-mcp/`](https://github.com/theYahia/YaAll/tree/main/mcp/yandex-metrika-mcp)
->
-> Здесь больше ничего не обновляется. Задачи и pull request'ы — в YaAll.
->
-> **Archived — development moved to [theYahia/YaAll](https://github.com/theYahia/YaAll),**
-> a single repository bundling the whole Yandex stack. The current version of this
-> package now lives at [`mcp/yandex-metrika-mcp/`](https://github.com/theYahia/YaAll/tree/main/mcp/yandex-metrika-mcp). Please open issues and pull requests there.
-
 # @theyahia/yandex-metrika-mcp
 
 MCP server for Yandex.Metrica API — counters, goals, reports, logs, traffic sources, top pages. 15 tools, OAuth Bearer token auth.
