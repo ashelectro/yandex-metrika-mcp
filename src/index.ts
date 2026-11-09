@@ -199,15 +199,31 @@ async function main() {
   const httpMode = args.includes("--http");
   const port = Number(args.find((a) => a.startsWith("--port="))?.split("=")[1]) || 3000;
 
-  const server = createServer();
-
   if (httpMode) {
-    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => crypto.randomUUID() });
-    await server.connect(transport);
-
     const httpServer = http.createServer(async (req, res) => {
       if (req.url === "/mcp" || req.url?.startsWith("/mcp?")) {
-        await transport.handleRequest(req, res);
+        try {
+          const server = createServer();
+          const transport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: undefined,
+          });
+          res.on("close", () => {
+            transport.close();
+            server.close();
+          });
+          await server.connect(transport);
+          await transport.handleRequest(req, res);
+        } catch (error) {
+          console.error("[yandex-metrika-mcp] Request error:", error);
+          if (!res.headersSent) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({
+              jsonrpc: "2.0",
+              error: { code: -32603, message: "Internal server error" },
+              id: null,
+            }));
+          }
+        }
       } else if (req.url === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ status: "ok", tools: TOOL_COUNT }));
@@ -218,9 +234,10 @@ async function main() {
     });
 
     httpServer.listen(port, () => {
-      console.error(`[yandex-metrika-mcp] HTTP mode on port ${port}. ${TOOL_COUNT} tools. POST /mcp`);
+      console.error(`[yandex-metrika-mcp] HTTP mode (stateless) on port ${port}. ${TOOL_COUNT} tools. POST /mcp`);
     });
   } else {
+    const server = createServer();
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error(`[yandex-metrika-mcp] Stdio mode. ${TOOL_COUNT} tools. Requires YANDEX_METRIKA_TOKEN.`);
